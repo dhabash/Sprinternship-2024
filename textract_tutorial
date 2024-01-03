@@ -85,3 +85,4 @@ class DocumentProcessor:
         self.sqs.delete_queue(QueueUrl=self.sqsQueueUrl)
         self.sns.delete_topic(TopicArn=self.snsTopicArn)
     
+    
