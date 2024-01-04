@@ -10,14 +10,32 @@ from bs4 import BeautifulSoup
 
 root.dictionary = "/Users/muzoukwu/Documents/GitHub/Sprinternship-2024/whpool_month_of_2021-0o4"
 
+#notees 
+#import csv , import DicReader import DictReader 
+#from pathlib imoort Path
+#csv writer write row 
+
+
+
+#open each file in directory & write to the row  # for loop or while loop to do this
+
+
+
+
+
+
+
+
 all_data = []
 
 def parse_email(folder,filename)
     with open(os.path.join(folder,filename), 'r', encoding = 'utf-8') as file
-    soup = BeautifulSoup (fi)
+    soup = BeautifulSoup 
 
 
 
 
 
 #pd.read_html(body-517.html)
+
+
