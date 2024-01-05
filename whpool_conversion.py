@@ -2,7 +2,7 @@ import os
 import csv
 
 base_folder = "/Users/dhabash/Documents/GitHub/Sprinternship-2024/whpool_month_of_2021-04"
-output_csv_path = "/Users/dhabash/Documents/GitHub/Sprinternship-2024/output123.csv"
+output_csv_path = "/Users/dhabash/Documents/GitHub/Sprinternship-2024/output_4.csv"
 
 HEADER = ["File Name", "Content"]
 
