@@ -1,0 +1,43 @@
+import boto3
+import json
+
+# Initialize the SageMaker runtime client
+sagemaker_runtime = boto3.client('sagemaker-runtime')
+
+# Your SageMaker endpoint name
+endpoint_name = 'your-endpoint-name'
+
+def predict_ner(text):
+    """
+    Send text to the SageMaker endpoint for NER prediction.
+    """
+    # Send the text to the endpoint
+    response = sagemaker_runtime.invoke_endpoint(
+        EndpointName=endpoint_name,
+        ContentType='text/plain',  # or 'application/json' depending on your model
+        Body=text
+    )
+
+    # Decode the response
+    result = json.loads(response['Body'].read().decode())
+    return result
+
+def process_file(file_path):
+    """
+    Process a single file for NER prediction.
+    """
+    with open(file_path, 'r') as file:
+        file_content = file.read()
+        return predict_ner(file_content)
+
+def main():
+    # Path to your file or files
+    file_paths = ['path/to/your/file1.txt', 'path/to/your/file2.txt']
+
+    # Process each file
+    for path in file_paths:
+        ner_results = process_file(path)
+        print(f"Results for {path}: {ner_results}")
+
+if __name__ == "__main__":
+    main()
