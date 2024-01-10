@@ -1,0 +1,41 @@
+import boto3
+import sagemaker
+from sagemaker.transformer import Transformer
+
+# Create a sagemaker session
+sagemaker_session = sagemaker.Session()
+
+# Define the model name (this should be the name of your deployed model)
+model_name = 'your-model-name'
+
+# Define input and output data format
+input_data_format = 'text/plain'  # Adjust based on your model's expected input format
+output_data_format = 'application/jsonlines'  # Adjust based on your model's output format
+
+# Define S3 paths for input and output
+input_s3_path = 's3://your-bucket/input-data/'
+output_s3_path = 's3://your-bucket/output-data/'
+
+# Initialize a transformer object
+transformer = Transformer(
+    model_name=model_name,
+    instance_count=1,
+    instance_type='ml.m5.xlarge',
+    output_path=output_s3_path,
+    sagemaker_session=sagemaker_session
+)
+
+# Start the batch transform job
+transformer.transform(
+    data=input_s3_path,
+    data_type='S3Prefix',
+    content_type=input_data_format,
+    split_type='Line',
+    input_filter='$[0,5]',
+    output_filter='$[0,-1]',
+    join_source='Input',
+    assemble_with='Line'
+)
+
+# Wait for the job to finish
+transformer.wait()
