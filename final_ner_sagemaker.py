@@ -64,33 +64,31 @@ predictor = sagemaker.predictor.Predictor(
 #NOTE for error regarding (ResourceLimitExceeded) you have to go to SageMaker and search "increase quota" then search "ml.m5.xlarge" and request more quotas each time. Then re-run the code.
 
 
-def process_files_from_s3(bucket, prefix, output_csv_file, threshold=0.8):
+def process_files_from_s3(bucket, prefix, threshold=0.8):
     s3_client = boto3.client('s3')
     response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-    data_to_write = []
+
     for obj in response.get('Contents', []):
         file_key = obj['Key']
-    response = s3_client.get_object(Bucket=bucket, Key=file_key)
-    content = response['Body'].read().decode('utf-8')
 
-    result = predictor.predict({
+        # Read the content directly from S3
+        response = s3_client.get_object(Bucket=bucket, Key=file_key)
+        content = response['Body'].read().decode('utf-8')
+
+        # Make a prediction using the deployed model
+        result = predictor.predict({
             "inputs": content,
         })
 
-    result_json = json.loads(result)
+        result_json = json.loads(result)
 
-    for entry in result_json:
-        if entry['score'] >= threshold:  # Filter based on confidence threshold
-            data_to_write.append([file_key, entry['text'], entry['type'], entry['score']])
+        for entry in result_json:
+            print(entry)
 
-    # Write the data to a CSV file
-    with open(output_csv_file, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['File Name', 'Extracted Text', 'Entity Type', 'Confidence Score'])
-        writer.writerows(data_to_write)
+    
 
-# Example usage of the function
-    process_files_from_s3(
-        bucket='sagemaker-studio-284762642143-l7zk0dm3e7k',
-        prefix='testrun1',
-        output_csv_file='output_predictions.csv')
+# Replace 'your-s3-bucket' and 'your-output-prefix' with your S3 bucket and prefix
+process_files_from_s3(bucket='sagemaker-studio-284762642143-l7zk0dm3e7k', prefix='testrun1')
+
+
+
