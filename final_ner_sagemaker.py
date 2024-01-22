@@ -65,33 +65,23 @@ predictor = sagemaker.predictor.Predictor(
 
 
 def process_files_from_s3(bucket, prefix, output_csv_file, threshold=0.8):
-    """
-    Processes files from an S3 bucket and writes the prediction results to a CSV file.
-
-    :param bucket: S3 bucket name
-    :param prefix: S3 prefix to filter the objects to be processed
-    :param output_csv_file: Path to the output CSV file
-    :param threshold: Confidence threshold for filtering predictions
-    """
     s3_client = boto3.client('s3')
     response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
     data_to_write = []
-
     for obj in response.get('Contents', []):
         file_key = obj['Key']
+    response = s3_client.get_object(Bucket=bucket, Key=file_key)
+    content = response['Body'].read().decode('utf-8')
 
-        # Read the content directly from S3
-        s3_object = s3_client.get_object(Bucket=bucket, Key=file_key)
-        content = s3_object['Body'].read().decode('utf-8')
+    result = predictor.predict({
+            "inputs": content,
+        })
 
-        # Make a prediction using the deployed model
-        result = predictor.predict({"inputs": content})
-        result_json = json.loads(result)
+    result_json = json.loads(result)
 
-        # Process and append results to data_to_write
-        for entry in result_json:
-            if entry['score'] >= threshold:  # Filter based on confidence threshold
-                data_to_write.append([file_key, entry['text'], entry['type'], entry['score']])
+    for entry in result_json:
+        if entry['score'] >= threshold:  # Filter based on confidence threshold
+            data_to_write.append([file_key, entry['text'], entry['type'], entry['score']])
 
     # Write the data to a CSV file
     with open(output_csv_file, 'w', newline='') as file:
@@ -104,6 +94,3 @@ def process_files_from_s3(bucket, prefix, output_csv_file, threshold=0.8):
         bucket='sagemaker-studio-284762642143-l7zk0dm3e7k',
         prefix='testrun1',
         output_csv_file='output_predictions.csv')
-    
-
-print("hello world")
