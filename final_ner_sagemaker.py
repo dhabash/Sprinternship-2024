@@ -85,8 +85,6 @@ def process_files_from_s3(bucket, prefix, threshold=0.8):
         for entry in result_json:
             print(entry)
 
-    
-
 # Replace 'your-s3-bucket' and 'your-output-prefix' with your S3 bucket and prefix
 process_files_from_s3(bucket='sagemaker-studio-284762642143-l7zk0dm3e7k', prefix='testrun1')
 
